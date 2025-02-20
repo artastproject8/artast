@@ -13,23 +13,12 @@
 </head>
 <body>
     <div class="container">
+        <img src="https://disk.yandex.ru/i/ClsqbrPRy56BFA" alt="ArtAst Logo">
         <h1>Добро пожаловать в ArtAst</h1>
-        <button onclick="openLink('people')">Люди</button>
-        <button onclick="openLink('spaces')">Пространства</button>
-        <button onclick="openLink('events')">События</button>
-        <button onclick="openLink('apply')">Подать заявку</button>
+        <button onclick="window.location.href='/people.html'">Люди</button>
+        <button onclick="window.location.href='/spaces.html'">Пространства</button>
+        <button onclick="window.location.href='/events.html'">События</button>
+        <button onclick="window.location.href='/form.html'">Заполнить анкету</button>
     </div>
-
-    <script>
-        function openLink(section) {
-            const links = {
-                people: "https://t.me/ArtAstPeopleBot",
-                spaces: "https://t.me/ArtAstPeopleBot",
-                events: "https://t.me/ArtAstPeopleBot",
-                apply: "https://t.me/ArtAstPeopleBot"
-            };
-            window.location.href = links[section];
-        }
-    </script>
 </body>
 </html>
