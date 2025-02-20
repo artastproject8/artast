@@ -43,15 +43,15 @@ bot.use(session());
 bot.use(stage.middleware());
 
 // ✅ Исправленные кнопки в стартовом сообщении
-bot.start((ctx) => {
-  ctx.reply("✅ Бот работает! Выберите действие:", {
-    reply_markup: Markup.inlineKeyboard([
-      [Markup.button.callback("👤 Добавить человека", "apply_people")],
-      [Markup.button.callback("🏛 Добавить пространство", "apply_space")],
-      [Markup.button.callback("📅 Добавить событие", "apply_event")],
-      [Markup.button.callback("✍️ Подать заявку", "apply")]
-    ]),
-  });
+bot.start(async (ctx) => {
+  await ctx.reply("✅ Бот работает! Выберите действие:", 
+    Markup.inlineKeyboard([
+      [Markup.button.webApp("👥 Люди", process.env.WEB_APP_URL)],
+      [Markup.button.webApp("🏛 Пространства", process.env.WEB_APP_URL)],
+      [Markup.button.webApp("📅 События", process.env.WEB_APP_URL)],
+      [Markup.button.webApp("✍️ Подать заявку", process.env.WEB_APP_URL)]
+    ])
+  );
 });
 
 // Обработчики кнопок
