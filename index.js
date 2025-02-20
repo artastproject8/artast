@@ -13,33 +13,19 @@ app.post("/webhook", (req, res) => {
 
 // Команда /start
 bot.start((ctx) => {
-  ctx.reply("Добро пожаловать в ArtAst! Выберите действие:", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "👥 Люди", url: process.env.APP_URL }],
-        [{ text: "🏛 Пространства", url: process.env.APP_URL }],
-        [{ text: "📅 События", url: process.env.APP_URL }],
-        [{ text: "✍️ Подать заявку", callback_data: "apply" }]
-      ]
-    }
-  });
+  ctx.reply("Добро пожаловать в ArtAst! Выберите действие:", 
+    Markup.inlineKeyboard([
+      [Markup.button.url("👥 Люди", "https://artast-artasts-projects-d1b148c6.vercel.app/")],
+      [Markup.button.url("🏛 Пространства", "https://artast-artasts-projects-d1b148c6.vercel.app/")],
+      [Markup.button.url("📅 События", "https://artast-artasts-projects-d1b148c6.vercel.app/")],
+      [Markup.button.url("✍️ Подать заявку", "https://artast-artasts-projects-d1b148c6.vercel.app/")]
+    ])
+  );
 });
 
-// Обработка нажатия "Подать заявку"
-bot.action("apply", async (ctx) => {
-  await ctx.answerCbQuery();
-  ctx.reply("Выберите тип заявки:", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "🧑‍🎨 Личную анкету", callback_data: "apply_person" }],
-        [{ text: "🏛 Пространство", callback_data: "apply_space" }],
-        [{ text: "🎭 Событие", callback_data: "apply_event" }]
-      ]
-    }
-  });
-});
-
-// Запуск сервера
+// Запускаем сервер
 app.listen(3000, () => {
   console.log("Сервер запущен на порту 3000");
 });
+
+module.exports = app;
