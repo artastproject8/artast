@@ -17,9 +17,9 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-// 🎭 Одна тестовая сцена (заявка для людей)
-const peopleScene = new Scenes.WizardScene(
-  "people",
+// 🎭 Форма заявки
+const applicationScene = new Scenes.WizardScene(
+  "application",
   async (ctx) => {
     await ctx.reply("📌 Введите ваше имя:");
     return ctx.wizard.next();
@@ -31,34 +31,59 @@ const peopleScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     ctx.wizard.state.city = ctx.message.text;
-    await ctx.reply("✅ Ваша заявка получена!");
-    console.log("Новая заявка:", ctx.wizard.state);
+    await ctx.reply("✍️ Расскажите о себе (до 400 символов):");
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    if (ctx.message.text.length > 400) {
+      await ctx.reply("⚠️ Текст слишком длинный! Попробуйте ещё раз (до 400 символов).");
+      return;
+    }
+    ctx.wizard.state.bio = ctx.message.text;
+    await ctx.reply("📞 Укажите контакт (телеграм, инстаграм, телефон):");
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    ctx.wizard.state.contact = ctx.message.text;
+    await ctx.reply(
+      "✅ Ваша заявка получена! Мы свяжемся с вами после модерации."
+    );
+
+    // Отправляем данные тебе
+    const adminMessage = `
+🚀 *Новая заявка:*
+👤 Имя: ${ctx.wizard.state.name}
+📍 Город: ${ctx.wizard.state.city}
+📝 О себе: ${ctx.wizard.state.bio}
+📞 Контакты: ${ctx.wizard.state.contact}
+    `;
+    
+    await bot.telegram.sendMessage(process.env.ADMIN_CHAT_ID, adminMessage, { parse_mode: "Markdown" });
+
     return ctx.scene.leave();
   }
 );
 
-// Создаём сцену и включаем в бота
-const stage = new Scenes.Stage([peopleScene]);
+// Создаём сцену
+const stage = new Scenes.Stage([applicationScene]);
 bot.use(session());
 bot.use(stage.middleware());
 
-// ✅ Исправленные кнопки в стартовом сообщении
+// ✅ Кнопки на стартовом экране
 bot.start(async (ctx) => {
   await ctx.reply("✅ Бот работает! Выберите действие:", 
     Markup.inlineKeyboard([
       [Markup.button.webApp("👥 Люди", process.env.WEB_APP_URL)],
       [Markup.button.webApp("🏛 Пространства", process.env.WEB_APP_URL)],
       [Markup.button.webApp("📅 События", process.env.WEB_APP_URL)],
-      [Markup.button.webApp("✍️ Подать заявку", process.env.WEB_APP_URL)]
+      [Markup.button.webApp("✍️ Подать заявку", process.env.WEB_APP_URL)],
+      [Markup.button.callback("✏️ Подать заявку в боте", "apply_bot")]
     ])
   );
 });
 
-// Обработчики кнопок
-bot.action("apply_people", (ctx) => ctx.scene.enter("people"));
-bot.action("apply_space", (ctx) => ctx.reply("Функция добавления пространства в разработке."));
-bot.action("apply_event", (ctx) => ctx.reply("Функция добавления события в разработке."));
-bot.action("apply", (ctx) => ctx.reply("Форма подачи заявки ещё не готова."));
+// Обработчик кнопки "Подать заявку в боте"
+bot.action("apply_bot", (ctx) => ctx.scene.enter("application"));
 
 // Запуск сервера
 app.listen(3000, () => console.log("Сервер запущен на порту 3000"));
