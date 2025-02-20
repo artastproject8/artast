@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заполнить анкету</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #181818; color: white; }
+        .container { max-width: 400px; margin: 20px auto; padding: 20px; background-color: #222; border-radius: 10px; }
+        input, select, textarea { width: 100%; margin: 10px 0; padding: 8px; border-radius: 5px; border: none; }
+        button { padding: 10px; background-color: #f4a261; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Заполнить анкету</h2>
+        <form id="applicationForm">
+            <input type="text" id="name" placeholder="Имя" required>
+            <input type="text" id="city" placeholder="Город" required>
+            <select id="category">
+                <option value="photographer">Фотограф</option>
+                <option value="artist">Художник</option>
+                <option value="model">Модель</option>
+                <option value="musician">Музыкант</option>
+                <option value="writer">Писатель</option>
+            </select>
+            <textarea id="about" placeholder="О себе"></textarea>
+            <input type="text" id="contacts" placeholder="Контакты (Instagram, Telegram)">
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("applicationForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const city = document.getElementById("city").value;
+            const category = document.getElementById("category").value;
+            const about = document.getElementById("about").value;
+            const contacts = document.getElementById("contacts").value;
+
+            fetch("https://artast-artasts-projects-d1b148c6.vercel.app/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, city, category, about, contacts })
+            }).then(response => {
+                if (response.ok) {
+                    alert("Анкета отправлена!");
+                } else {
+                    alert("Ошибка при отправке.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
