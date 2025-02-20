@@ -1,21 +1,32 @@
-const { Telegraf, Scenes, session, Markup } = require("telegraf"); const express = require("express");
+async function sendApplication(ctx, type) {
+  let application = `Новая заявка в раздел *${type}*\n\n`;
+  for (let key in ctx.wizard.state) {
+    if (key !== "photos" && key !== "works" && key !== "poster") {
+      application += `- ${key}: ${ctx.wizard.state[key]}\n`;
+    }
+  }
 
-const bot = new Telegraf(process.env.BOT_TOKEN); const app = express();
+  try {
+    await bot.telegram.sendMessage(process.env.ADMIN_CHAT_ID, application, { parse_mode: "Markdown" });
 
-// Webhook app.use(express.json()); app.post("/webhook", async (req, res) => { try { console.log("Webhook получил данные:", req.body); await bot.handleUpdate(req.body); res.sendStatus(200); } catch (error) { console.error("Ошибка обработки запроса:", error); res.sendStatus(500); } });
+    if (ctx.wizard.state.photos) {
+      for (let photo of ctx.wizard.state.photos) {
+        await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, photo);
+      }
+    }
+    if (ctx.wizard.state.works) {
+      for (let work of ctx.wizard.state.works) {
+        await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, work);
+      }
+    }
+    if (ctx.wizard.state.poster) {
+      await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, ctx.wizard.state.poster);
+    }
 
-// Сцена для заявки "Люди" const peopleScene = new Scenes.WizardScene( "people", async (ctx) => { await ctx.reply("📌 Введите ваше имя:"); return ctx.wizard.next(); }, async (ctx) => { ctx.wizard.state.name = ctx.message.text; await ctx.reply("📍 Укажите ваш город:"); return ctx.wizard.next(); }, async (ctx) => { ctx.wizard.state.city = ctx.message.text; await ctx.reply("✍️ Напишите о себе (до 400 символов):"); return ctx.wizard.next(); }, async (ctx) => { if (ctx.message.text.length > 400) { await ctx.reply("❌ Текст слишком длинный. Введите не более 400 символов:"); return; } ctx.wizard.state.bio = ctx.message.text; await ctx.reply("📞 Укажите ваш контакт (телеграм, инстаграм, телефон):"); return ctx.wizard.next(); }, async (ctx) => { ctx.wizard.state.contact = ctx.message.text; await sendApplication(ctx, "Люди"); } );
-
-// Функция отправки заявки в админ-чат async function sendApplication(ctx, type) { const adminChatId = process.env.ADMIN_CHAT_ID; let application = 🚀 Новая заявка в раздел *${type}*:\n; application += 👤 Имя: ${ctx.wizard.state.name}\n; application += 📍 Город: ${ctx.wizard.state.city}\n; application += 📝 О себе: ${ctx.wizard.state.bio}\n; application += 📞 Контакты: ${ctx.wizard.state.contact}\n;
-
-await bot.telegram.sendMessage(adminChatId, application, { parse_mode: "Markdown" }); await ctx.reply("✅ Ваша заявка отправлена на модерацию!"); return ctx.scene.leave(); }
-
-// Подключаем сцену const stage = new Scenes.Stage([peopleScene]); bot.use(session()); bot.use(stage.middleware());
-
-// Главное меню bot.start((ctx) => { ctx.reply("✅ Бот работает! Выберите действие:", { reply_markup: Markup.inlineKeyboard([ [Markup.button.webApp("👥 Люди", process.env.WEB_APP_URL)], [Markup.button.webApp("🏛 Пространства", process.env.WEB_APP_URL)], [Markup.button.webApp("📅 События", process.env.WEB_APP_URL)], [Markup.button.callback("✍️ Заполнить анкету", "apply_people")] ]), }); });
-
-// Обработчик анкеты bot.action("apply_people", (ctx) => ctx.scene.enter("people"));
-
-// Запуск сервера app.listen(3000, () => console.log("Сервер запущен на порту 3000"));
-
-module.exports = app;
+    await ctx.reply("✅ Ваша заявка отправлена на модерацию!");
+    return ctx.scene.leave();
+  } catch (error) {
+    console.error("Ошибка отправки заявки:", error);
+    await ctx.reply("❌ Ошибка при отправке заявки. Попробуйте позже.");
+  }
+}
