@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtAst</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #000; color: white; }
+        .container { margin-top: 50px; }
+        button { display: block; margin: 10px auto; padding: 15px 25px; font-size: 18px; border: none; cursor: pointer; background-color: #f4a261; color: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ArtAst</h1>
+        <p>Выбери раздел:</p>
+        <button onclick="openSection('people')">Люди</button>
+        <button onclick="openSection('spaces')">Пространства</button>
+        <button onclick="openSection('events')">События</button>
+        <button onclick="openSection('apply')">Подать заявку</button>
+    </div>
+
+    <script>
+        function openSection(section) {
+            const links = {
+                people: "https://t.me/ArtAstPeopleBot?start=people",
+                spaces: "https://t.me/ArtAstPeopleBot?start=spaces",
+                events: "https://t.me/ArtAstPeopleBot?start=events",
+                apply: "https://t.me/ArtAstPeopleBot?start=apply"
+            };
+            window.location.href = links[section];
+        }
+    </script>
+</body>
+</html>
