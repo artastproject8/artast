@@ -5,7 +5,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const app = express();
 
 // Твой Telegram ID (чтобы получать заявки)
-const ADMIN_ID = "ТВОЙ_TG_ID"; 
+const ADMIN_ID = "ТВОЙ_TG_ID";
 
 // Устанавливаем webhook
 bot.telegram.setWebhook(process.env.WEBHOOK_URL);
@@ -25,7 +25,8 @@ bot.start((ctx) => {
 });
 
 // Обработка подачи заявки
-bot.action("apply", (ctx) => {
+bot.action("apply", async (ctx) => {
+  await ctx.answerCbQuery(); // Убирает "зависание" кнопки
   ctx.reply("Что вы хотите разместить?", Markup.inlineKeyboard([
     [Markup.button.callback("🧑‍🎨 Личную анкету", "apply_person")],
     [Markup.button.callback("🏛 Пространство", "apply_space")],
@@ -44,11 +45,22 @@ const askForData = async (ctx, type) => {
 };
 
 // Личные анкеты
-bot.action("apply_person", (ctx) => askForData(ctx, "person"));
+bot.action("apply_person", async (ctx) => {
+  await ctx.answerCbQuery();
+  askForData(ctx, "person");
+});
+
 // Пространства
-bot.action("apply_space", (ctx) => askForData(ctx, "space"));
+bot.action("apply_space", async (ctx) => {
+  await ctx.answerCbQuery();
+  askForData(ctx, "space");
+});
+
 // События
-bot.action("apply_event", (ctx) => askForData(ctx, "event"));
+bot.action("apply_event", async (ctx) => {
+  await ctx.answerCbQuery();
+  askForData(ctx, "event");
+});
 
 // Обработчик ответов пользователей
 bot.on("text", async (ctx) => {
