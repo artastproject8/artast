@@ -1,32 +1,24 @@
-async function sendApplication(ctx, type) {
-  let application = `Новая заявка в раздел *${type}*\n\n`;
-  for (let key in ctx.wizard.state) {
-    if (key !== "photos" && key !== "works" && key !== "poster") {
-      application += `- ${key}: ${ctx.wizard.state[key]}\n`;
-    }
-  }
+const { Telegraf, Markup } = require("telegraf"); const express = require("express");
 
-  try {
-    await bot.telegram.sendMessage(process.env.ADMIN_CHAT_ID, application, { parse_mode: "Markdown" });
+const bot = new Telegraf(process.env.BOT_TOKEN); const app = express(); const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
 
-    if (ctx.wizard.state.photos) {
-      for (let photo of ctx.wizard.state.photos) {
-        await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, photo);
-      }
-    }
-    if (ctx.wizard.state.works) {
-      for (let work of ctx.wizard.state.works) {
-        await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, work);
-      }
-    }
-    if (ctx.wizard.state.poster) {
-      await bot.telegram.sendPhoto(process.env.ADMIN_CHAT_ID, ctx.wizard.state.poster);
-    }
+// Webhook app.use(express.json()); app.post("/webhook", async (req, res) => { try { console.log("Webhook получил данные:", req.body); await bot.handleUpdate(req.body); res.sendStatus(200); } catch (error) { console.error("Ошибка обработки запроса:", error); res.sendStatus(500); } });
 
-    await ctx.reply("✅ Ваша заявка отправлена на модерацию!");
-    return ctx.scene.leave();
-  } catch (error) {
-    console.error("Ошибка отправки заявки:", error);
-    await ctx.reply("❌ Ошибка при отправке заявки. Попробуйте позже.");
-  }
-}
+// Стартовое сообщение с кнопками bot.start((ctx) => { ctx.reply("✅ Бот работает! Выберите действие:", { reply_markup: Markup.inlineKeyboard([ [Markup.button.callback("👤 Подать заявку", "apply")], ]), }); });
+
+// Логика сбора данных bot.action("apply", async (ctx) => { ctx.reply("📌 Введите ваше имя:"); bot.on("text", async (ctx) => { const name = ctx.message.text; await ctx.reply("📍 Укажите ваш город:"); bot.on("text", async (ctx) => { const city = ctx.message.text; await ctx.reply("📞 Укажите ваш контакт (телеграм, инстаграм, телефон):"); bot.on("text", async (ctx) => { const contact = ctx.message.text;
+
+const message = `🚀 Новая заявка!
+
+👤 Имя: ${name} 📍 Город: ${city} 📞 Контакт: ${contact}`;
+
+await bot.telegram.sendMessage(ADMIN_CHAT_ID, message);
+    await ctx.reply("✅ Ваша заявка отправлена!");
+  });
+});
+
+}); });
+
+// Запуск сервера app.listen(3000, () => console.log("Сервер запущен на порту 3000"));
+
+module.exports = app;
