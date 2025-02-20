@@ -25,21 +25,23 @@ bot.start((ctx) => {
   });
 });
 
-// Привязываем кнопку "Люди" к мини-приложению
-bot.action("people", (ctx) => {
-  ctx.answerCbQuery();
-  ctx.reply("🔗 Открываю мини-приложение...", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "Открыть", url: "https://artast-artasts-projects-d1b148c6.vercel.app/people" }]
-      ],
-    },
+// Привязываем кнопки к мини-приложению
+const sections = {
+  people: "https://artast-artasts-projects-d1b148c6.vercel.app/people",
+  spaces: "https://artast-artasts-projects-d1b148c6.vercel.app/spaces",
+  events: "https://artast-artasts-projects-d1b148c6.vercel.app/events",
+  apply: "https://artast-artasts-projects-d1b148c6.vercel.app/apply",
+};
+
+Object.keys(sections).forEach((key) => {
+  bot.action(key, (ctx) => {
+    ctx.answerCbQuery();
+    ctx.reply("🔗 Открываю мини-приложение...", {
+      reply_markup: {
+        inline_keyboard: [[{ text: "Открыть", url: sections[key] }]],
+      },
+    });
   });
 });
-
-// Остальные кнопки остаются как есть
-bot.action("spaces", (ctx) => ctx.reply("Раздел с пространствами: фотостудии, арт-галереи и т.д."));
-bot.action("events", (ctx) => ctx.reply("Раздел с событиями: афиши, анонсы и т.д."));
-bot.action("apply", (ctx) => ctx.reply("Форма для подачи заявки: [Ссылка на Google Form]"));
 
 module.exports = app;
