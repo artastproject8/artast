@@ -11,42 +11,35 @@ app.post("/webhook", (req, res) => {
   bot.handleUpdate(req.body, res);
 });
 
-// Главная страница мини-приложения
-app.get("/", (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ArtAst Mini App</title>
-        <style>
-          body { font-family: Arial, sans-serif; text-align: center; background-color: #181818; color: white; }
-          .container { margin-top: 50px; }
-          button { display: block; margin: 10px auto; padding: 10px 20px; font-size: 18px; border: none; cursor: pointer; background-color: #f4a261; color: white; border-radius: 5px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Добро пожаловать в ArtAst</h1>
-          <button onclick="window.location.href='/people'">Люди</button>
-          <button onclick="window.location.href='/spaces'">Пространства</button>
-          <button onclick="window.location.href='/events'">События</button>
-          <button onclick="window.location.href='/apply'">Подать заявку</button>
-        </div>
-      </body>
-    </html>
-  `);
+// Команда /start
+bot.start((ctx) => {
+  ctx.reply("Добро пожаловать в ArtAst! Выберите действие:", {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "👥 Люди", callback_data: "people" }],
+        [{ text: "🏛 Пространства", callback_data: "spaces" }],
+        [{ text: "📅 События", callback_data: "events" }],
+        [{ text: "✍️ Подать заявку", callback_data: "apply" }],
+      ],
+    },
+  });
 });
 
-// Страницы разделов
-app.get("/people", (req, res) => res.send("<h1>Раздел: Люди</h1><p>Список творческих людей...</p>"));
-app.get("/spaces", (req, res) => res.send("<h1>Раздел: Пространства</h1><p>Список пространств...</p>"));
-app.get("/events", (req, res) => res.send("<h1>Раздел: События</h1><p>Афиши и мероприятия...</p>"));
-app.get("/apply", (req, res) => res.send("<h1>Подать заявку</h1><p>Форма для подачи заявки...</p>"));
-
-// Запускаем сервер
-app.listen(3000, () => {
-  console.log("Сервер запущен на порту 3000");
+// Привязываем кнопку "Люди" к мини-приложению
+bot.action("people", (ctx) => {
+  ctx.answerCbQuery();
+  ctx.reply("🔗 Открываю мини-приложение...", {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "Открыть", url: "https://artast-artasts-projects-d1b148c6.vercel.app/people" }]
+      ],
+    },
+  });
 });
+
+// Остальные кнопки остаются как есть
+bot.action("spaces", (ctx) => ctx.reply("Раздел с пространствами: фотостудии, арт-галереи и т.д."));
+bot.action("events", (ctx) => ctx.reply("Раздел с событиями: афиши, анонсы и т.д."));
+bot.action("apply", (ctx) => ctx.reply("Форма для подачи заявки: [Ссылка на Google Form]"));
 
 module.exports = app;
