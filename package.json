@@ -1,0 +1,13 @@
+{
+  "name": "artast-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for ArtAst project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.12.2",
+    "express": "^4.18.2"
+  }
+}
